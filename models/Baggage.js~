@@ -1,0 +1,13 @@
+var mongoose = require('mongoose');
+
+var BaggageSchema = new monogoose.Schema({
+  provider: int,
+  from: String,
+  to: String,
+  weight: float,
+  space: [int, int, int],
+  contact: String,
+  info: String
+});
+
+mongoose.model('Baggage', BaggageSchema);
