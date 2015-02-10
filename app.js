@@ -1,19 +1,18 @@
 var express = require('express');
+var app = express();
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
-
-var users = require('./routes/users');
-
 var mongoose = require('mongoose');
-var app = express();
+var passport = require('passport');
 
-mongoose.connect('mongodb://localhost/syb');
-require('./models/baggages');
-var routes = require('./routes/index');
+var configDB = require('./config/database');
+mongoose.connect(configDB.url);
+
+require('./config/passport')(passport);
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -25,22 +24,23 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(passport.initialize());
 
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, authorization");
+  res.header( 'Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
   next();
 });
 
-app.use('/', routes);
-app.use('/users', users);
+require('./routes/index')(app, passport);
 
-// catch 404 and forward to error handler
+/* catch 404 and forward to error handler
 app.use(function(req, res, next) {
     var err = new Error('Not Found');
     err.status = 404;
     next(err);
-});
+});*/
 
 // error handlers
 
@@ -65,6 +65,8 @@ app.use(function(err, req, res, next) {
         error: {}
     });
 });
+
+
 
 
 module.exports = app;
