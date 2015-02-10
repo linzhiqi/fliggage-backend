@@ -170,14 +170,14 @@ module.exports = function(app, passport) {
 */
 
   app.get('/auth/linkedin',
-    passport.authenticate('linkedin', { scope : ['r_basicprofile', 'r_emailaddress']}
+    passport.authenticate('linkedin', { scope : ['r_basicprofile', 'r_emailaddress'], session: false }
     )
   );
 
   app.get('/auth/linkedin/return', function(req, res, next) {
     passport.authenticate('linkedin', 
       { 
-        
+        session: false 
       }, function(err, user, info){
         console.log('!!user:'+JSON.stringify(user));
         if (err) { return next(err); }

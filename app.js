@@ -7,6 +7,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var passport = require('passport');
+var session = require('express-session');
 
 var configDB = require('./config/database');
 mongoose.connect(configDB.url);
@@ -24,7 +25,17 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+// session required by linkedin
+var configAuth = require('./config/auth');
+
+app.use(session({
+  secret: configAuth.sessionSecret,
+  resave: false,
+  saveUninitialized: true
+}));
 app.use(passport.initialize());
+// session required by linkedin
+app.use(passport.session());
 
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -32,6 +43,8 @@ app.use(function(req, res, next) {
   res.header( 'Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
   next();
 });
+
+
 
 require('./routes/index')(app, passport);
 

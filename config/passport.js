@@ -105,7 +105,6 @@ module.exports = function(passport) {
       clientSecret: configAuth.linkedinAuth.clientSecret,
       callbackURL: configAuth.linkedinAuth.callbackURL,
       scope: ['r_emailaddress', 'r_basicprofile'],
-      profileFields: ['id', 'formatted-name', 'picture-url'],
       passReqToCallback   : true,
       state: true
     },
@@ -121,17 +120,22 @@ module.exports = function(passport) {
           }
           if(user){
             user.token = accessToken;
+            user.save();
             return done(null, user);
           } else {
             var userModel = new User({
                 provider: 'linkedin',
                 id: profile.id,
                 name: profile['displayName'],
-                email: profile['emails'][0]['value'],
-                image: profile['photos'][0]['value'],
                 token: accessToken
               });
-            userModel.save(function(err, user) {
+            if(profile['emails'][0]){
+              userModel.email = profile['emails'][0]['value'];
+            }
+            if(profile['photos'][0]){
+              userModel.image = profile['photos'][0]['value'];
+            }
+            userModel.save(function(err, user) { 
               console.log('!!user:'+JSON.stringify(user));
               console.log('!!token:'+accessToken);
               console.log('!!refreshtoken:'+refreshToken);
