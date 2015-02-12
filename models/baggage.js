@@ -9,7 +9,8 @@ var BaggageSchema = new mongoose.Schema({
   arriveAfter: Number,
   weight: Number,
   space: [Number],
-  info: String
+  info: String,
+  time : { type : Date, default: Date.now }
 });
 
 module.exports = mongoose.model('Baggage', BaggageSchema);
