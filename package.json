@@ -18,7 +18,9 @@
     "passport-facebook": "^1.0.3",
     "passport-google-oauth2": "^0.1.4",
     "passport-linkedin-oauth2": "^1.2.1",
+    "passport-sina": "^0.1.0",
     "passport-token-auth": "^0.1.2",
+    "passport-twitter": "^1.0.2",
     "serve-favicon": "~2.2.0"
   }
 }

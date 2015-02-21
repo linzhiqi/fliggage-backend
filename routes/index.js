@@ -289,6 +289,8 @@ module.exports = function(app, passport) {
     });
   });
 
+  var client_root_url = 'http://chinesemonster.serveblog.net:8000/fliggage';
+
 // Redirect the user to Google for authentication.  When complete, Google
 // will redirect the user back to the application at
 //     /auth/google/return
@@ -310,8 +312,8 @@ module.exports = function(app, passport) {
       }, function(err, user, info){
         console.log('!!user:'+JSON.stringify(user));
         if (err) { return next(err); }
-        if (!user) { return res.redirect('http://localhost:8000/app/#/signin'); }
-        return res.redirect("http://localhost:8000/app/#/signed-in/"+user.token);
+        if (!user) { return res.redirect(client_root_url+'/#/signin'); }
+        return res.redirect(client_root_url+"/#/signed-in/"+user.token);
       })(req, res, next);
   });
 
@@ -329,8 +331,8 @@ module.exports = function(app, passport) {
       }, function(err, user, info){
         console.log('!!user:'+JSON.stringify(user));
         if (err) { return next(err); }
-        if (!user) { return res.redirect('http://localhost:8000/app/#/signin'); }
-        return res.redirect("http://localhost:8000/app/#/signed-in/"+user.token);
+        if (!user) { return res.redirect(client_root_url+'/#/signin'); }
+        return res.redirect(client_root_url+"/#/signed-in/"+user.token);
       })(req, res, next);
   });
 /*
@@ -354,10 +356,44 @@ module.exports = function(app, passport) {
       }, function(err, user, info){
         console.log('!!user:'+JSON.stringify(user));
         if (err) { return next(err); }
-        if (!user) { return res.redirect('http://localhost:8000/app/#/signin'); }
-        return res.redirect("http://localhost:8000/app/#/signed-in/"+user.token);
+        if (!user) { return res.redirect(client_root_url+'/#/signin'); }
+        return res.redirect(client_root_url+"/#/signed-in/"+user.token);
       })(req, res, next);
   });
+
+  app.get('/auth/twitter',
+    passport.authenticate('twitter')
+  );
+
+  app.get('/auth/twitter/return', function(req, res, next) {
+    passport.authenticate('twitter', 
+      { 
+        session: false 
+      }, function(err, user, info){
+        console.log('!!user:'+JSON.stringify(user));
+        if (err) { return next(err); }
+        if (!user) { return res.redirect(client_root_url+'/#/signin'); }
+        return res.redirect(client_root_url+"/#/signed-in/"+user.token);
+      })(req, res, next);
+  });
+
+  app.get('/auth/weibo',
+    passport.authenticate('sina')
+  );
+
+  app.get('/auth/weibo/return', function(req, res, next) {
+    passport.authenticate('sina', 
+      { 
+        session: false 
+      }, function(err, user, info){
+        console.log('!!user:'+JSON.stringify(user));
+        if (err) { return next(err); }
+        if (!user) { return res.redirect(client_root_url+'/#/signin'); }
+        return res.redirect(client_root_url+"/#/signed-in/"+user.token);
+      })(req, res, next);
+  });
+
+
 };
 
 
