@@ -2,7 +2,7 @@
 
 
 
-module.exports = function(app, passport) {
+module.exports = function(app, passport, ioObject) {
 
 
 /* GET home page. 
@@ -17,7 +17,7 @@ module.exports = function(app, passport) {
   var RequestedBaggage = require('../models/requestedbaggage');
   var User = require('../models/user');
 
-  app.get('/baggage/location', function(req, res, next) {
+  app.get('/baggage', function(req, res, next) {
     Baggage.find(function(err, baggages){
       if(err){ return next(err); }
       var bObjects = [];
@@ -111,6 +111,16 @@ module.exports = function(app, passport) {
     }
   );
 
+  //emit to the websocket of the toId: the function
+  var nofityNewMsg = function(ioObject, fromUid, toUid, msg, timestamp){
+  	var target = ioObject.connections[toUid];
+  	if(target){
+  		target.emit('new_message', {'fromUid': fromUid, 'message': msg, 'timestamp': timestamp});
+  	}else{
+  		console.log('no connection for uid: ' + toUid);
+  	}
+  }
+
   app.post('/message', passport.authenticate('token', { session: false }),
     function(req, res, next) {
       if(req.body.fromId !== req.user._id.toHexString()){
@@ -133,10 +143,21 @@ module.exports = function(app, passport) {
                     requestorId:  req.body.fromId,
                   });
                   request.save(function(err, data){
-                    if(err){ return next(err); }
+                    if(err){ 
+                    	return next(err); 
+                    }else{
+                    	//emit to the websocket of the toId
+                    	nofityNewMsg(ioObject, req.body.fromId, req.body.toId, req.body.content, new Date());
+                    }
                   });
+                }else{
+                	//emit to the websocket of the toId
+                	nofityNewMsg(ioObject, req.body.fromId, req.body.toId, req.body.content, new Date());
                 }
             });
+          }else{
+          	//emit to the websocket of the toId
+          	nofityNewMsg(ioObject, req.body.fromId, req.body.toId, req.body.content, new Date());
           }
           res.json(message);
         });
